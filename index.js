@@ -4,8 +4,10 @@ const port=8001;
 
 const db=require('./config/db')
 const app=express();
-const passport=require('./config/passport-jwt')
-const stratergy=require('passport-jwt')
+const passport = require('./config/passport-jwt')
+// const passport1 = require('./config/passpoert-jwt2')
+
+const stratergy = require('passport-jwt')
 const session=require('express-session');
 const path=require('path')
 
@@ -40,7 +42,12 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
+// app.use(passport1.initialize())
+// app.use(passport1.session())
+
 app.use('/',require('./routes/adminRoutes'))
+app.use('/user',require('./routes/UserRoutes'))
+
 
 app.listen(port,(err)=>{
     if(err){

@@ -5,30 +5,37 @@ const Hotel = require('../Modle/HotelModel')
 const Car = require('../Modle/CarModel')
 const Flight = require('../Modle/FlightModel')
 
-module.exports.register=async(req,res)=>{
-    let checkEmail=await Admin.findOne({email:req.body.email})
-
-    if(!checkEmail){
-        if(req.body.password==req.body.confirmpassword){
-            const checkpass=await bcrypt.hash(req.body.password,10)
-            if(checkpass){
-                let addAdmin= await Admin.create(req.body)
-                if(addAdmin){
-                    return res.status(200).json({msg:'added succesfully',data:addAdmin})
-                }else{
-        return res.status(200).json({msg:"admindata is not add"})
-
-                }
-            }
-        }else{
-        return res.status(200).json({msg:"password and confirm password is not match"})
-
+module.exports.register = async (req, res) => {
+    try {
+        if (!req.body.password || !req.body.confirmpassword) {
+            return res.status(400).json({ msg: "Password fields are required" });
         }
-    }else{
-        return res.status(200).json({msg:"email is already exists"})
+
+        let checkEmail = await User.findOne({ email: req.body.email });
+
+        if (!checkEmail) {
+            if (req.body.password === req.body.confirmpassword) {
+                const checkpass = await bcrypt.hash(req.body.password, 10);
+                const newUser = new User({ username, email, password });
+                await newUser.save();
+                let addUser = await User.create({
+                    ...req.body,  
+                    password: checkpass,  // 👈 Save hashed password
+                });
+
+                return res.status(200).json({ msg: 'Added successfully', data: addUser });
+            } else {
+                return res.status(400).json({ msg: "Password and Confirm Password do not match" });
+            }
+        } else {
+            return res.status(400).json({ msg: "Email already exists" });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ msg: "Internal Server Error", error: err.message });
     }
-    
-}
+};
+
 
 module.exports.Login=async(req,res)=>{
 

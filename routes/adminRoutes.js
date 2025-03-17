@@ -22,6 +22,7 @@ routes.use('/car',passport.authenticate('jwt',{failureRedirect:'/falier'}),requi
 routes.use('/Hotel',passport.authenticate('jwt',{failureRedirect:'/falier'}),require('./HotelRoutes'))
 
 routes.get('/falier',(req,res)=>{
+    // console.log(err)
     return res.status(200).json({msg:'invalid token'})
 })
 
