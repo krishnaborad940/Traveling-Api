@@ -6,33 +6,23 @@ const Car = require('../Modle/CarModel')
 const Flight = require('../Modle/FlightModel')
 
 module.exports.register = async (req, res) => {
-    try {
-        if (!req.body.password || !req.body.confirmpassword) {
-            return res.status(400).json({ msg: "Password fields are required" });
+    try{
+        let checkemail=await Admin.findOne({email:req.body.email})
+        if(!checkemail){
+           if(req.body.password==req.body.confirmPassword){
+            req.body.password=await bcrypt.hash(req.body.password,10)
+                let addregister=await Admin.create(req.body)
+            return res.status(400).json({msg:"register successfully",data:addregister})
+
+            } 
+        }else{
+            return res.status(400).json({msg:"Email already exists"})
+
         }
+    }catch(err){
+        console.log("somthing went wrong")
+            return res.status(400).json({msg:"Email already exists"})
 
-        let checkEmail = await User.findOne({ email: req.body.email });
-
-        if (!checkEmail) {
-            if (req.body.password === req.body.confirmpassword) {
-                const checkpass = await bcrypt.hash(req.body.password, 10);
-                const newUser = new User({ username, email, password });
-                await newUser.save();
-                let addUser = await User.create({
-                    ...req.body,  
-                    password: checkpass,  // 👈 Save hashed password
-                });
-
-                return res.status(200).json({ msg: 'Added successfully', data: addUser });
-            } else {
-                return res.status(400).json({ msg: "Password and Confirm Password do not match" });
-            }
-        } else {
-            return res.status(400).json({ msg: "Email already exists" });
-        }
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ msg: "Internal Server Error", error: err.message });
     }
 };
 
